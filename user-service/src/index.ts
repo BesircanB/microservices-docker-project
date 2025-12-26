@@ -1,4 +1,5 @@
 import express from "express";
+import { startSubscriber } from "./rabbitmq.subscriber";
 
 const app = express();
 app.use(express.json());
@@ -36,4 +37,5 @@ app.get("/users/:id", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`User service running at http://localhost:${PORT}`);
+  startSubscriber().catch(err => console.error("Subscriber check failed:", err));
 });

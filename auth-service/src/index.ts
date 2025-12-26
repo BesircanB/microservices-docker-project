@@ -1,4 +1,5 @@
 import express from "express";
+import { publishUserCreated } from "./rabbitmq.publisher";
 
 const app = express();
 app.use(express.json());
@@ -9,7 +10,7 @@ const PORT = 3001;
 const users: { id: number; email: string; password: string }[] = [];
 
 // Register endpoint
-app.post("/auth/register", (req, res) => {
+app.post("/auth/register", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -28,6 +29,11 @@ app.post("/auth/register", (req, res) => {
   };
 
   users.push(newUser);
+
+  await publishUserCreated({
+    id: newUser.id,
+    email: newUser.email
+  });
 
   res.json({
     message: "User registered successfully",
